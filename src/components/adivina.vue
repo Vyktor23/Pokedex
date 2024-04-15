@@ -19,7 +19,7 @@ let imagenColor = ref("gris");
 
 function revisar() {
 	if (respuesta.value.toLowerCase() == pokemon.value.name) {
-		alert('Todo bien');
+		alert('¡Excelente has acertado, felicidades!');
 		imagenColor.value = 'clara';
 	} else {
 		alert('Parece que no era')
