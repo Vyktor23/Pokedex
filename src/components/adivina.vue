@@ -1,3 +1,54 @@
+<template>
+  <div id="contenidoMain">
+    <q-card class="pokemon-card">
+      <div class="q-card-section">
+        <img :src="pokemon.sprites.other['official-artwork'].front_default" alt="" v-if="pokemon.sprites" class="imagen_principal" :style="{ filter: imagenColor === 'gris' ? 'contrast(1%)' : '' }" />
+        <div class="pokemon-type-container">
+          <div v-for="(e, i) in pokemon.types" :key="i" class="pokemon-type" :class="e.type.name">
+            {{ e.type.name }}
+          </div>
+        </div>
+      </div>
+
+      <div class="q-card-section">
+        <div class="pokemon-info">
+          <div class="info-item">
+            <span class="info-label">Altura:</span>
+            <span>{{ pokemon.height }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Peso:</span>
+            <span>{{ pokemon.weight }}</span>
+          </div>
+		  <div class="info-item" v-if="pokemon.id">
+            <span class="info-label">Hp:</span>
+            <span>{{ pokemon.stats[0].base_stat}}</span>
+          </div>
+        </div>
+      </div>
+    </q-card>
+
+    <!-- Sección para ingresar respuesta -->
+    <div id="respuestaAqui">
+      <q-input v-model="respuesta" @keyup.enter="revisar" placeholder="Nombre del Pokémon" />
+      <q-btn color="primary" @click="revisar">Responder</q-btn>
+    </div>
+
+    <!-- Diálogo para mostrar mensajes de respuesta -->
+    <q-dialog v-model="dialogVisible">
+      <q-card class="dialog-card">
+        <q-card-section class="text-center">
+          <q-card-title class="dialog-title">{{ mensajeTitulo }}</q-card-title>
+          <q-card-text class="dialog-text">{{ mensajeTexto }}</q-card-text>
+        </q-card-section>
+        <q-card-actions align="center">
+          <q-btn color="primary" label="Aceptar" @click="dialogVisible = false" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
+</template>
+
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
@@ -5,175 +56,151 @@ import axios from "axios";
 let pokemon = ref([]);
 let respuesta = ref("");
 let imagenColor = ref("gris");
+let dialogVisible = ref(false);
+let mensajeTitulo = ref("");
+let mensajeTexto = ref("");
 
 (async function traer() {
-	try {
+    try {
         let numero = Math.floor(Math.random() * 1025) + 1;
-		let r = await axios.get("https://pokeapi.co/api/v2/pokemon/" + numero);
-		pokemon.value = r.data;
-		console.log(r.data);
-	} catch (error) {
-		console.log(error);
-	}
-})()
+        let r = await axios.get("https://pokeapi.co/api/v2/pokemon/" + numero);
+        pokemon.value = r.data;
+        console.log(r.data);
+    } catch (error) {
+        console.log(error);
+    }
+})();
 
 function revisar() {
-	if (respuesta.value.toLowerCase() == pokemon.value.name) {
-		alert('¡Excelente has acertado, felicidades!');
-		imagenColor.value = 'clara';
-	} else {
-		alert('Parece que no era')
-	}
+    if (respuesta.value.toLowerCase() == pokemon.value.name) {
+        imagenColor.value = 'clara';
+        dialogVisible.value = true;
+        mensajeTitulo.value = '¡Excelente acertaste, felicidades!';
+        mensajeTexto.value = '';
+    } else {
+        dialogVisible.value = true;
+        mensajeTitulo.value = 'Parece que no era, vuelve a intentarlo.';
+    }
 }
 </script>
 
-<template>
-    <div id="contenidoMain">
-        <section class="justify-center card">
-			<!-- tarjeta -->
-
-			<!-- <div class="parte1">
-				<div v-if="pokemon.id">
-					ID:
-					{{ pokemon.id }}
-				</div>
-				<div>
-					{{ pokemon.name }}
-				</div>
-			</div> -->
-
-			<div class="parte2">
-				<img :src="pokemon.sprites.other['official-artwork'].front_default" alt="" v-if="pokemon.sprites" class="imagen_principal" :style="{ filter: imagenColor === 'gris' ? 'contrast(1%)' : '' }" />
-				<div v-for="(e, i) in pokemon.types" :key="i">
-					{{ e.type.name }}
-				</div>
-				<!-- <div v-if="pokemon.base_experience">
-					Exp. Base:
-					{{ pokemon.base_experience }}
-				</div>
-				<div v-if="pokemon.height">
-					Height:
-					{{ pokemon.height }}
-				</div>
-				<div v-if="pokemon.weight">
-					Weight:
-					{{ pokemon.weight }}
-				</div> -->
-			</div>
-
-			<div class="parte3">
-				<section class="linear-progress-section">
-					<!-- Sección de barras de progreso -->
-					<div class="linear-progress">
-						<label rounded size="14px" color="purple" class="stat-name text-xs font-semibold text-black">
-							{{ pokemon.stats[0].stat.name }}
-							<q-linear-progress :id="'ID${i}' + i" :value="Number(`0.${pokemon.stats[0].base_stat}`)" :buffer="Number(`0.${pokemon.stats[0].base_stat + 10}`)" rounded size="25px" color="blue">
-								<div class="absolute-full flex flex-center">
-									<q-badge color="white" text-color="accent" :label="pokemon.stats[0].base_stat" />
-								</div>
-							</q-linear-progress>
-						</label>
-						<label rounded size="14px" color="purple" class="stat-name text-xs font-semibold text-black">
-							{{ pokemon.stats[1].stat.name }}
-							<q-linear-progress :id="'ID${i}' + i" :value="Number(`0.${pokemon.stats[1].base_stat}`)" :buffer="Number(`0.${pokemon.stats[1].base_stat + 10}`)" rounded size="25px" color="blue">
-								<div class="absolute-full flex flex-center">
-									<q-badge color="white" text-color="accent" :label="pokemon.stats[1].base_stat" />
-								</div>
-							</q-linear-progress>
-						</label>
-						<label rounded size="14px" color="purple" class="stat-name text-xs font-semibold text-black">
-							{{ pokemon.stats[2].stat.name }}
-							<q-linear-progress :id="'ID${i}' + i" :value="Number(`0.${pokemon.stats[2].base_stat}`)" :buffer="Number(`0.${pokemon.stats[2].base_stat + 10}`)" rounded size="25px" color="blue">
-								<div class="absolute-full flex flex-center">
-									<q-badge color="white" text-color="accent" :label="pokemon.stats[2].base_stat" />
-								</div>
-							</q-linear-progress>
-						</label>
-					</div>
-				</section>
-			</div>
-			
-        </section>
-		<div id="respuestaAqui">
-			<input type="text" v-model="respuesta">
-			<button @click="revisar()">Responder</button>
-		</div>
-		
-    </div>
-</template>
-
 <style scoped>
-#respuestaAqui {
-	position: absolute;
-	top: 85vh;
-	left: 50%;
-	transform: translate(-50%, -50%);
+
+.pokemon-info {
+  padding: 10px;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
 }
+
+.info-item {
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  background-color:darkkhaki;
+}
+
+
+.info-item{
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 40px;
+    font-weight: bold;
+}
+
 
 #contenidoMain {
-	height: 100%;
+  height: 100%;
+  background-color: white;
 }
 
-.pokedex-container {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	background-color: white;
+.pokemon-card {
+  max-width: 800px;
+  max-height: 8000px;
+  margin-top: 40px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 50px;
+  font-size: 18px;
 }
+
+.pokemon-type-container {
+  display: flex;
+  justify-content: center;
+}
+
+.pokemon-type {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border-radius: 40px;
+  font-weight: bold;
+}
+
+.normal { background-color: #A8A878; }
+.fire { background-color: #F08030; }
+.water { background-color: #6890F0; }
+.electric { background-color: #F8D030; }
+.grass { background-color: #78C850; }
+.ice { background-color: #98D8D8; }
+.fighting { background-color: #C03028; }
+.poison { background-color: #A040A0; }
+.ground { background-color: #E0C068; }
+.flying { background-color: #A890F0; }
+.psychic { background-color: #F85888; }
+.bug { background-color: #A8B820; }
+.rock { background-color: #B8A038; }
+.ghost { background-color: #705898; }
+.dragon { background-color: #7038F8; }
+.dark { background-color: #705848; }
+.steel { background-color: #B8B8D0; }
+.fairy { background-color: #EE99AC; }
 
 .imagen_principal {
-	width: 250px;
-	height: 250px;
+  width: 300px;
+  height: 300px;
+  margin-left: 280px;
 }
 
-.card {
-	background-color: white;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 100%;
-	color: black;
-	gap: 30px;
-	text-align: center;
+.pokemon-info {
+  margin-top: 20px;
+  color: black;
 }
 
-.parte3 {
-	width: 20rem;
+.info-item {
+  margin-bottom: 10px;
+  display: flex;
+  color: black;
 }
 
-.search-section {
-	display: grid;
-	gap: 15px;
-	margin-bottom: 50px;
-	margin-top: 30px;
-	font-size: 18px;
+.info-label {
+  font-weight: bold;
+  color: black;
 }
 
-.stats-section {
-	margin-top: 10px;
+#respuestaAqui {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
-.stat-name {
-	color: #333;
-	font-size: 18px;
+.dialog-card {
+  max-width: 300px;
+  background-color: white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-.linear-progress {
-	margin-bottom: 10px;
+.dialog-title {
+  font-size: 18px;
+  color: #333;
 }
 
-.bg-gradient {
-	background: linear-gradient(to right, #673ab7, #2196f3);
-}
-
-.linear-progress {
-	text-align: center;
-}
-
-.q-page-container {
-	flex: 1;
+.dialog-text {
+  font-size: 16px;
+  color: #666;
 }
 </style>
