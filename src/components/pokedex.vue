@@ -71,6 +71,12 @@ function getTypeClass(type) {
 
 <template>
 	<div id="contenidoMain">
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
 	  <section class="buscador">
 		<!-- buscador -->
 		<input type="text" placeholder="Número o nombre del Pokémon..." v-model="buscador" id="texto" />
@@ -133,18 +139,47 @@ function getTypeClass(type) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -100px;
+  padding: 20px;
+  margin-top: 60px; /* Ajuste para evitar que el buscador quede oculto */
 }
 
 .buscador {
   text-align: center;
   padding: 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 15px;
-  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
 }
 
+#texto {
+  width: 100%;
+  max-width: 240px;
+}
+
+.card {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+.parte1,
+.parte2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+}
 
 .pokemon-id {
   margin-bottom: 5px;
@@ -156,80 +191,39 @@ function getTypeClass(type) {
   font-size: 26px;
   font-weight: bold;
   color: #333;
+  text-transform: capitalize;
 }
 
-#texto {
-  width: 240px;
-}
-
-.card {
-  background-color: white;
-  display: flex;
-  flex-direction: row;
-  width: 80%;
-  height: 100%;
-  margin-top: 20px;
-  padding: 30px;
-  border-radius: 70px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  color: black;
-  font-size: 16px;
-}
-
-.parte1 {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-}
-
-.parte1 .info-label {
+.parte1 .info-label,
+.parte2 .info-label {
   font-weight: bold;
 }
 
 .parte1 .imagen_principal {
-  width: 250px;
-  height: 250px;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
   margin-top: 20px;
 }
 
 .sprites-container {
   display: flex;
-  gap: 80px;
-  margin-top: 40px;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.parte2 {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
+.sprites-container img {
+  width: 50px;
+  height: 50px;
 }
 
-.parte2 .info-label {
-  font-weight: bold;
-  padding: 3px 8px;
-  border-radius: 10px;
-}
-
-
-.value {
-  margin-left: 5px;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 16px;
-  background-color: rgb(126, 192, 212);
-}
-
+.value,
 .type {
   margin-left: 5px;
   padding: 3px 8px;
   border-radius: 10px;
   font-size: 16px;
 }
-
 
 .type-normal { background-color: #A8A878; }
 .type-fire { background-color: #F08030; }
@@ -251,12 +245,13 @@ function getTypeClass(type) {
 .type-fairy { background-color: #EE99AC; }
 
 .linear-progress-section {
-  margin-top: 40px;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .progress-bar-container {
   width: 100%;
-  height: 100%;
+  height: 20px;
   background-color: #f0f0f0;
   border-radius: 5px;
   margin-bottom: 6px;
@@ -266,5 +261,28 @@ function getTypeClass(type) {
   height: 100%;
   background-color: #4caf50;
   border-radius: 5px;
+}
+
+@media (min-width: 600px) {
+  .buscador {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .card {
+    flex-direction: row;
+    padding: 30px;
+    border-radius: 20px;
+  }
+
+  .parte1,
+  .parte2 {
+    flex: 1;
+    padding: 10px;
+  }
+
+  .sprites-container {
+    gap: 20px;
+  }
 }
 </style>
