@@ -20,9 +20,9 @@
             <span class="info-label">Peso:</span>
             <span>{{ pokemon.weight }}</span>
           </div>
-		  <div class="info-item" v-if="pokemon.id">
+          <div class="info-item" v-if="pokemon.id">
             <span class="info-label">Hp:</span>
-            <span>{{ pokemon.stats[0].base_stat}}</span>
+            <span>{{ pokemon.stats[0].base_stat }}</span>
           </div>
         </div>
       </div>
@@ -85,60 +85,98 @@ function revisar() {
 </script>
 
 <style scoped>
-
-.pokemon-info {
-  padding: 10px;
-  width: 200px;
-  height: 200px;
+#contenidoMain {
+  height: 100%;
+  background-color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: auto;
-}
-
-.info-item {
-  margin-bottom: 8px;
-  padding: 5px 10px;
-  background-color:darkkhaki;
-}
-
-
-.info-item{
-    margin: 0 5px;
-    padding: 5px 10px;
-    border-radius: 40px;
-    font-weight: bold;
-}
-
-
-#contenidoMain {
-  height: 100%;
-  background-color: white;
+  padding: 20px;
 }
 
 .pokemon-card {
-  max-width: 800px;
-  max-height: 8000px;
-  margin-top: 40px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 50px;
+  max-width: 100%;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
   font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .pokemon-type-container {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .pokemon-type {
-  margin: 0 5px;
+  margin: 5px;
   padding: 5px 10px;
   border-radius: 40px;
   font-weight: bold;
 }
 
+.imagen_principal {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin: auto;
+}
+
+.pokemon-info {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.info-item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+  max-width: 300px;
+  padding: 10px;
+  background-color: darkkhaki;
+  border-radius: 10px;
+}
+
+.info-label {
+  font-weight: bold;
+}
+
+#respuestaAqui {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.dialog-card {
+  max-width: 300px;
+  background-color: white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-title {
+  font-size: 18px;
+  color: #333;
+}
+
+.dialog-text {
+  font-size: 16px;
+  color: #666;
+}
+
+/* Tipos de Pokémon */
 .normal { background-color: #A8A878; }
 .fire { background-color: #F08030; }
 .water { background-color: #6890F0; }
@@ -158,49 +196,33 @@ function revisar() {
 .steel { background-color: #B8B8D0; }
 .fairy { background-color: #EE99AC; }
 
-.imagen_principal {
-  width: 300px;
-  height: 300px;
-  margin-left: 280px;
+@media (min-width: 768px) {
+  .pokemon-card {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .pokemon-info {
+    width: 50%;
+  }
+  
+  .imagen_principal {
+    width: 50%;
+  }
+  
+  .info-item {
+    margin: 5px;
+    padding: 10px 20px;
+  }
 }
 
-.pokemon-info {
-  margin-top: 20px;
-  color: black;
-}
-
-.info-item {
-  margin-bottom: 10px;
-  display: flex;
-  color: black;
-}
-
-.info-label {
-  font-weight: bold;
-  color: black;
-}
-
-#respuestaAqui {
-  margin-top: 20px;
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-}
-
-.dialog-card {
-  max-width: 300px;
-  background-color: white;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-.dialog-title {
-  font-size: 18px;
-  color: #333;
-}
-
-.dialog-text {
-  font-size: 16px;
-  color: #666;
+@media (min-width: 1024px) {
+  .pokemon-card {
+    max-width: 800px;
+  }
+  
+  .imagen_principal {
+    max-width: 400px;
+  }
 }
 </style>

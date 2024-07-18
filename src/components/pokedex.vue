@@ -71,18 +71,6 @@ function getTypeClass(type) {
 
 <template>
 	<div id="contenidoMain">
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-	  <section class="buscador">
-		<!-- buscador -->
-		<input type="text" placeholder="Número o nombre del Pokémon..." v-model="buscador" id="texto" />
-		<button @click="buscar()">Consultar</button>
-		<button @click="random()">Impresióname</button>
-	  </section>
   
 	  <section class="card">
 		<!-- tarjeta -->
@@ -131,16 +119,31 @@ function getTypeClass(type) {
 		  </section>
 		</div>
 	  </section>
+    <section class="buscador">
+      <!-- buscador -->
+      <input type="text" placeholder="Número o nombre del Pokémon..." v-model="buscador" id="texto" />
+      <button @click="buscar()">Consultar</button>
+      <button @click="random()">Impresióname</button>
+      </section>
 	</div>
   </template>
 
 <style scoped>
+/* Estilos base */
+html, body {
+  background-color: white; /* Fondo blanco para toda la página */
+  margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100%; /* Asegura que el body ocupe toda la altura de la ventana */
+}
+
 #contenidoMain {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  margin-top: 60px; /* Ajuste para evitar que el buscador quede oculto */
+  margin-top: 60px;
+  background-color: white; /* Fondo blanco para el contenedor principal */
 }
 
 .buscador {
@@ -151,23 +154,54 @@ function getTypeClass(type) {
   gap: 15px;
   width: 100%;
   max-width: 600px;
+  margin-top: 20px; /* Espacio superior para separarlo de otros contenidos */
 }
 
 #texto {
   width: 100%;
   max-width: 240px;
+  padding: 10px;
+  border: 2px solid #4caf50;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.buscador button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.buscador button:first-of-type {
+  background-color: #4caf50;
+}
+
+.buscador button:last-of-type {
+  background-color: #f44336;
+}
+
+.buscador button:hover {
+  background-color: #333;
+}
+
+.buscador button:nth-child(2):hover {
+  background-color: #d32f2f;
 }
 
 .card {
-  background-color: white;
+  background-color: white; /* Fondo blanco para la tarjeta */
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px; /* Reducido de 600px a 500px */
   margin-top: 20px;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px; /* Reducido de 20px a 15px */
+  border-radius: 15px; /* Reducido de 20px a 15px */
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1); /* Reducido de 10px a 8px */
   color: black;
 }
 
@@ -183,12 +217,12 @@ function getTypeClass(type) {
 
 .pokemon-id {
   margin-bottom: 5px;
-  font-size: 20px;
+  font-size: 18px; /* Reducido de 20px a 18px */
   font-weight: bold;
 }
 
 .pokemon-name {
-  font-size: 26px;
+  font-size: 22px; /* Reducido de 26px a 22px */
   font-weight: bold;
   color: #333;
   text-transform: capitalize;
@@ -201,28 +235,28 @@ function getTypeClass(type) {
 
 .parte1 .imagen_principal {
   width: 100%;
-  max-width: 250px;
+  max-width: 200px; /* Reducido de 250px a 200px */
   height: auto;
-  margin-top: 20px;
+  margin-top: 15px; /* Reducido de 20px a 15px */
 }
 
 .sprites-container {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 8px; /* Reducido de 10px a 8px */
+  margin-top: 15px; /* Reducido de 20px a 15px */
 }
 
 .sprites-container img {
-  width: 50px;
-  height: 50px;
+  width: 40px; /* Reducido de 50px a 40px */
+  height: 40px; /* Reducido de 50px a 40px */
 }
 
 .value,
 .type {
   margin-left: 5px;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 16px;
+  padding: 3px 6px; /* Reducido de 3px 8px a 3px 6px */
+  border-radius: 8px; /* Reducido de 10px a 8px */
+  font-size: 14px; /* Reducido de 16px a 14px */
 }
 
 .type-normal { background-color: #A8A878; }
@@ -246,12 +280,12 @@ function getTypeClass(type) {
 
 .linear-progress-section {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 15px; /* Reducido de 20px a 15px */
 }
 
 .progress-bar-container {
   width: 100%;
-  height: 20px;
+  height: 18px; /* Reducido de 20px a 18px */
   background-color: #f0f0f0;
   border-radius: 5px;
   margin-bottom: 6px;
@@ -263,26 +297,57 @@ function getTypeClass(type) {
   border-radius: 5px;
 }
 
-@media (min-width: 600px) {
+/* Estilos para pantallas menores de 600px */
+@media (max-width: 599px) {
+  #contenidoMain {
+    padding: 10px;
+  }
+
   .buscador {
-    flex-direction: row;
-    justify-content: center;
+    padding: 5px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #texto {
+    max-width: 100%;
+    font-size: 14px;
+  }
+
+  .buscador button {
+    padding: 8px 16px;
+    font-size: 14px;
   }
 
   .card {
-    flex-direction: row;
-    padding: 30px;
-    border-radius: 20px;
+    padding: 12px; /* Reducido de 15px a 12px */
+    margin-top: 10px;
   }
 
   .parte1,
   .parte2 {
-    flex: 1;
-    padding: 10px;
+    flex-direction: column;
+    align-items: center;
   }
 
   .sprites-container {
-    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sprites-container img {
+    width: 30px; /* Reducido de 40px a 30px */
+    height: 30px; /* Reducido de 40px a 30px */
+  }
+
+  .pokemon-id,
+  .pokemon-name {
+    font-size: 16px; /* Reducido de 18px a 16px */
+  }
+
+  .value,
+  .type {
+    font-size: 12px; /* Reducido de 14px a 12px */
   }
 }
 </style>
