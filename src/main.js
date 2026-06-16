@@ -10,8 +10,10 @@ const app = createApp(App)
 
 app.use(router)
 
+import { Notify } from 'quasar'
+
 app.use(Quasar, {
-    plugins: {},
+    plugins: { Notify },
 })
 
 app.mount('#app')

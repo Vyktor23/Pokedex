@@ -1,353 +1,448 @@
 <script setup>
-import { ref } from "vue";
-import axios from "axios";
+import { ref } from 'vue'
+import axios from 'axios'
 
-let pokemon = ref([]);
-let buscador = ref("");
+const pokemon = ref(null)
+const buscador = ref('')
+const loading = ref(false)
+const error = ref('')
 
 function random() {
-    let numero = Math.floor(Math.random() * 1025) + 1;
-    traer(numero);
+  const numero = Math.floor(Math.random() * 1025) + 1
+  traer(numero)
 }
 
 function buscar() {
-    traer(buscador.value);
+  if (!buscador.value.trim()) {
+    error.value = 'Escribe un número o nombre de Pokémon.'
+    return
+  }
+  traer(buscador.value.trim())
 }
 
 async function traer(numero) {
-    try {
-        let r = await axios.get("https://pokeapi.co/api/v2/pokemon/" + numero);
-        pokemon.value = r.data;
-        console.log(r.data);
-    } catch (error) {
-        console.log(error);
-    }
+  loading.value = true
+  error.value = ''
+  pokemon.value = null
+
+  try {
+    const r = await axios.get(`https://pokeapi.co/api/v2/pokemon/${numero}`)
+    pokemon.value = r.data
+  } catch {
+    error.value = 'No se encontró ese Pokémon. Intenta con otro nombre o número.'
+  } finally {
+    loading.value = false
+  }
 }
 
-// Función para obtener la clase de color asociada a cada tipo de Pokémon
 function getTypeClass(type) {
-    switch (type) {
-        case 'normal':
-            return 'type-normal';
-        case 'fire':
-            return 'type-fire';
-        case 'water':
-            return 'type-water';
-        case 'electric':
-            return 'type-electric';
-        case 'grass':
-            return 'type-grass';
-        case 'ice':
-            return 'type-ice';
-        case 'fighting':
-            return 'type-fighting';
-        case 'poison':
-            return 'type-poison';
-        case 'ground':
-            return 'type-ground';
-        case 'flying':
-            return 'type-flying';
-        case 'psychic':
-            return 'type-psychic';
-        case 'bug':
-            return 'type-bug';
-        case 'rock':
-            return 'type-rock';
-        case 'ghost':
-            return 'type-ghost';
-        case 'dragon':
-            return 'type-dragon';
-        case 'dark':
-            return 'type-dark';
-        case 'steel':
-            return 'type-steel';
-        case 'fairy':
-            return 'type-fairy';
-        default:
-            return 'type-default';
-    }
+  return `type-${type}`
+}
+
+function statPercent(value) {
+  return `${Math.min((value / 255) * 100, 100)}%`
+}
+
+function formatHeight(decimeters) {
+  return `${(decimeters / 10).toFixed(1)} m`
+}
+
+function formatWeight(hectograms) {
+  return `${(hectograms / 10).toFixed(1)} kg`
 }
 </script>
 
 <template>
-	<div id="contenidoMain">
-  
-	  <section class="card">
-		<!-- tarjeta -->
-		<div class="parte1">
-		  <div class="pokemon-id" v-if="pokemon.id">
-			<span class="info-label">ID:</span>
-			<span>{{ pokemon.id }}</span>
-		  </div>
-		  <div class="pokemon-name">
-			{{ pokemon.name }}
-		  </div>
-		  <img :src="pokemon.sprites.other['official-artwork'].front_default" alt="" v-if="pokemon.sprites" class="imagen_principal" />
-		  <div class="sprites-container">
-			<img :src="pokemon.sprites.other.showdown.front_default" alt="" v-if="pokemon.sprites" />
-			<img :src="pokemon.sprites.other.showdown.back_default" alt="" v-if="pokemon.sprites" />
-		  </div>
-		</div>
-  
-		<div class="parte2">
-		  <section id="sub2">
-			<div v-for="(e, i) in pokemon.types" :key="i">
-			  <span class="info-label">Type:</span>
-			  <span class="type" :class="getTypeClass(e.type.name)">{{ e.type.name }}</span>
-			</div>
-			<div v-if="pokemon.base_experience">
-			  <span class="info-label">Exp. Base:</span>
-			  <span class="value">{{ pokemon.base_experience }}</span>
-			</div>
-			<div v-if="pokemon.height">
-			  <span class="info-label">Height:</span>
-			  <span class="value">{{ pokemon.height }}</span>
-			</div>
-			<div v-if="pokemon.weight">
-			  <span class="info-label">Weight:</span>
-			  <span class="value">{{ pokemon.weight }}</span>
-			</div>
-		  </section>
-		  <section class="linear-progress-section" id="subb2">
-			<!-- Sección de barras de progreso -->
-			<div class="linear-progress" v-for="(e, i) in pokemon.stats" :key="i">
-			  <label class="stat-name">{{ e.stat.name }}:</label>
-			  <div class="progress-bar-container">
-				<div class="progress-bar" :style="{ width: `${e.base_stat / 1}px` }">{{ e.base_stat }}</div>
-			  </div>
-			</div>
-		  </section>
-		</div>
-	  </section>
-    <section class="buscador">
-      <!-- buscador -->
-      <input type="text" placeholder="Número o nombre del Pokémon..." v-model="buscador" id="texto" />
-      <button @click="buscar()">Consultar</button>
-      <button @click="random()">Impresióname</button>
+  <q-page class="pokedex-page">
+    <div class="page-content">
+      <header class="page-header">
+        <h1 class="page-title">Explora Pokémon</h1>
+        <p class="page-subtitle">Busca por nombre o número, o deja que el azar elija uno por ti.</p>
+      </header>
+
+      <section class="search-section" aria-label="Buscador de Pokémon">
+        <q-input
+          v-model="buscador"
+          outlined
+          dense
+          bg-color="white"
+          placeholder="Número o nombre del Pokémon..."
+          class="search-input"
+          @keyup.enter="buscar"
+        >
+          <template #prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+
+        <div class="search-actions">
+          <q-btn
+            unelevated
+            color="positive"
+            icon="search"
+            label="Consultar"
+            class="action-btn"
+            :loading="loading"
+            @click="buscar"
+          />
+          <q-btn
+            unelevated
+            color="negative"
+            icon="casino"
+            label="Aleatorio"
+            class="action-btn"
+            :loading="loading"
+            @click="random"
+          />
+        </div>
       </section>
-	</div>
-  </template>
+
+      <q-banner v-if="error" rounded class="error-banner" dense>
+        <template #avatar>
+          <q-icon name="warning" color="negative" />
+        </template>
+        {{ error }}
+      </q-banner>
+
+      <div v-if="loading" class="loading-state">
+        <q-spinner-dots color="primary" size="48px" />
+        <p>Cargando Pokémon...</p>
+      </div>
+
+      <section v-else-if="pokemon" class="pokemon-card" aria-live="polite">
+        <div class="card-visual">
+          <span class="pokemon-id">#{{ String(pokemon.id).padStart(4, '0') }}</span>
+          <h2 class="pokemon-name">{{ pokemon.name }}</h2>
+
+          <div class="image-wrapper">
+            <img
+              v-if="pokemon.sprites?.other?.['official-artwork']?.front_default"
+              :src="pokemon.sprites.other['official-artwork'].front_default"
+              :alt="`Arte oficial de ${pokemon.name}`"
+              class="main-image"
+            />
+          </div>
+
+          <div v-if="pokemon.sprites" class="sprites-row">
+            <img
+              v-if="pokemon.sprites.other?.showdown?.front_default"
+              :src="pokemon.sprites.other.showdown.front_default"
+              alt="Sprite frontal"
+            />
+            <img
+              v-if="pokemon.sprites.other?.showdown?.back_default"
+              :src="pokemon.sprites.other.showdown.back_default"
+              alt="Sprite trasero"
+            />
+          </div>
+        </div>
+
+        <div class="card-details">
+          <div class="info-grid">
+            <div class="info-block">
+              <span class="info-label">Tipos</span>
+              <div class="types-row">
+                <span
+                  v-for="(e, i) in pokemon.types"
+                  :key="i"
+                  class="type"
+                  :class="getTypeClass(e.type.name)"
+                >
+                  {{ e.type.name }}
+                </span>
+              </div>
+            </div>
+
+            <div v-if="pokemon.base_experience" class="info-block">
+              <span class="info-label">Exp. base</span>
+              <span class="info-value">{{ pokemon.base_experience }}</span>
+            </div>
+
+            <div v-if="pokemon.height" class="info-block">
+              <span class="info-label">Altura</span>
+              <span class="info-value">{{ formatHeight(pokemon.height) }}</span>
+            </div>
+
+            <div v-if="pokemon.weight" class="info-block">
+              <span class="info-label">Peso</span>
+              <span class="info-value">{{ formatWeight(pokemon.weight) }}</span>
+            </div>
+          </div>
+
+          <div class="stats-section">
+            <h3 class="stats-title">Estadísticas base</h3>
+            <div
+              v-for="(e, i) in pokemon.stats"
+              :key="i"
+              class="stat-row"
+            >
+              <span class="stat-name">{{ e.stat.name }}</span>
+              <div class="progress-track">
+                <div
+                  class="progress-fill"
+                  :style="{ width: statPercent(e.base_stat) }"
+                >
+                  <span class="stat-value">{{ e.base_stat }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div v-else-if="!error" class="empty-state">
+        <q-icon name="catching_pokemon" size="64px" color="grey-5" />
+        <p>Usa el buscador o el botón aleatorio para ver un Pokémon.</p>
+      </div>
+    </div>
+  </q-page>
+</template>
 
 <style scoped>
-/* Estilos base */
-html, body {
-  background-color: white; /* Fondo blanco para toda la página */
-  margin: 0;
-  font-family: Arial, sans-serif;
-  height: 100%; /* Asegura que el body ocupe toda la altura de la ventana */
+.pokedex-page {
+  min-height: calc(100dvh - var(--header-height));
+  background: var(--color-bg);
 }
 
-#contenidoMain {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  margin-top: 60px;
-  background-color: white; /* Fondo blanco para el contenedor principal */
+.page-content {
+  width: 100%;
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 
-.buscador {
+.page-header {
   text-align: center;
-  padding: 10px;
+  margin-bottom: clamp(1rem, 4vw, 1.75rem);
+}
+
+.page-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  color: var(--color-text);
+}
+
+.page-subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.search-section {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  width: 100%;
-  max-width: 600px;
-  margin-top: 20px; /* Espacio superior para separarlo de otros contenidos */
+  gap: 0.75rem;
+  max-width: 640px;
+  margin: 0 auto clamp(1rem, 3vw, 1.5rem);
 }
 
-#texto {
-  width: 100%;
-  max-width: 240px;
-  padding: 10px;
-  border: 2px solid #4caf50;
-  border-radius: 5px;
-  font-size: 16px;
+@media (min-width: 600px) {
+  .search-section {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    flex: 1 1 220px;
+  }
+
+  .search-actions {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
 }
 
-.buscador button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.search-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.buscador button:first-of-type {
-  background-color: #4caf50;
+.action-btn {
+  flex: 1 1 auto;
+  min-width: min(100%, 140px);
 }
 
-.buscador button:last-of-type {
-  background-color: #f44336;
+.error-banner {
+  max-width: 640px;
+  margin: 0 auto 1rem;
+  background: #fff5f5;
+  color: var(--color-danger);
 }
 
-.buscador button:hover {
-  background-color: #333;
-}
-
-.buscador button:nth-child(2):hover {
-  background-color: #d32f2f;
-}
-
-.card {
-  background-color: white; /* Fondo blanco para la tarjeta */
+.loading-state,
+.empty-state {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 500px; /* Reducido de 600px a 500px */
-  margin-top: 20px;
-  padding: 15px; /* Reducido de 20px a 15px */
-  border-radius: 15px; /* Reducido de 20px a 15px */
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1); /* Reducido de 10px a 8px */
-  color: black;
-}
-
-.parte1,
-.parte2 {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  flex: 1;
-  width: 100%;
+  justify-content: center;
+  gap: 1rem;
+  padding: clamp(2rem, 8vw, 4rem) 1rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.pokemon-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 3vw, 1.5rem);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 24px var(--color-shadow);
+  padding: clamp(1rem, 4vw, 1.75rem);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .pokemon-card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+}
+
+.card-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .pokemon-id {
-  margin-bottom: 5px;
-  font-size: 18px; /* Reducido de 20px a 18px */
-  font-weight: bold;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
 }
 
 .pokemon-name {
-  font-size: 22px; /* Reducido de 26px a 22px */
-  font-weight: bold;
-  color: #333;
+  margin: 0.25rem 0 0.75rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  text-transform: capitalize;
+  color: var(--color-text);
+}
+
+.image-wrapper {
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sprites-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sprites-row img {
+  width: clamp(48px, 12vw, 72px);
+  height: clamp(48px, 12vw, 72px);
+  image-rendering: pixelated;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.info-block {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.info-value {
+  font-size: clamp(0.9375rem, 2.5vw, 1.0625rem);
+  font-weight: 600;
   text-transform: capitalize;
 }
 
-.parte1 .info-label,
-.parte2 .info-label {
-  font-weight: bold;
-}
-
-.parte1 .imagen_principal {
-  width: 100%;
-  max-width: 200px; /* Reducido de 250px a 200px */
-  height: auto;
-  margin-top: 15px; /* Reducido de 20px a 15px */
-}
-
-.sprites-container {
+.types-row {
   display: flex;
-  gap: 8px; /* Reducido de 10px a 8px */
-  margin-top: 15px; /* Reducido de 20px a 15px */
+  flex-wrap: wrap;
+  gap: 0.375rem;
 }
 
-.sprites-container img {
-  width: 40px; /* Reducido de 50px a 40px */
-  height: 40px; /* Reducido de 50px a 40px */
-}
-
-.value,
-.type {
-  margin-left: 5px;
-  padding: 3px 6px; /* Reducido de 3px 8px a 3px 6px */
-  border-radius: 8px; /* Reducido de 10px a 8px */
-  font-size: 14px; /* Reducido de 16px a 14px */
-}
-
-.type-normal { background-color: #A8A878; }
-.type-fire { background-color: #F08030; }
-.type-water { background-color: #6890F0; }
-.type-electric { background-color: #F8D030; }
-.type-grass { background-color: #78C850; }
-.type-ice { background-color: #98D8D8; }
-.type-fighting { background-color: #C03028; }
-.type-poison { background-color: #A040A0; }
-.type-ground { background-color: #E0C068; }
-.type-flying { background-color: #A890F0; }
-.type-psychic { background-color: #F85888; }
-.type-bug { background-color: #A8B820; }
-.type-rock { background-color: #B8A038; }
-.type-ghost { background-color: #705898; }
-.type-dragon { background-color: #7038F8; }
-.type-dark { background-color: #705848; }
-.type-steel { background-color: #B8B8D0; }
-.type-fairy { background-color: #EE99AC; }
-
-.linear-progress-section {
+.stats-section {
   width: 100%;
-  margin-top: 15px; /* Reducido de 20px a 15px */
 }
 
-.progress-bar-container {
-  width: 100%;
-  height: 18px; /* Reducido de 20px a 18px */
-  background-color: #f0f0f0;
-  border-radius: 5px;
-  margin-bottom: 6px;
+.stats-title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(0.9375rem, 2.5vw, 1.0625rem);
+  color: var(--color-text);
 }
 
-.progress-bar {
+.stat-row {
+  display: grid;
+  grid-template-columns: minmax(72px, 90px) 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-name {
+  font-size: clamp(0.75rem, 2vw, 0.8125rem);
+  text-transform: capitalize;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-track {
+  height: clamp(20px, 4vw, 24px);
+  background: var(--color-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
   height: 100%;
-  background-color: #4caf50;
-  border-radius: 5px;
+  min-width: 2rem;
+  background: linear-gradient(90deg, var(--color-success), #81c784);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.5rem;
+  transition: width 0.4s ease;
 }
 
-/* Estilos para pantallas menores de 600px */
-@media (max-width: 599px) {
-  #contenidoMain {
-    padding: 10px;
-  }
-
-  .buscador {
-    padding: 5px;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  #texto {
-    max-width: 100%;
-    font-size: 14px;
-  }
-
-  .buscador button {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-
-  .card {
-    padding: 12px; /* Reducido de 15px a 12px */
-    margin-top: 10px;
-  }
-
-  .parte1,
-  .parte2 {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .sprites-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .sprites-container img {
-    width: 30px; /* Reducido de 40px a 30px */
-    height: 30px; /* Reducido de 40px a 30px */
-  }
-
-  .pokemon-id,
-  .pokemon-name {
-    font-size: 16px; /* Reducido de 18px a 16px */
-  }
-
-  .value,
-  .type {
-    font-size: 12px; /* Reducido de 14px a 12px */
-  }
+.stat-value {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 </style>
